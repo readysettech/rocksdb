@@ -1971,6 +1971,12 @@ extern ROCKSDB_LIBRARY_API int rocksdb_compactoptions_get_target_level(
 extern ROCKSDB_LIBRARY_API void rocksdb_compactoptions_set_full_history_ts_low(
     rocksdb_compactoptions_t*, char* ts, size_t tslen);
 
+extern ROCKSDB_LIBRARY_API void rocksdb_compactoptions_create_canceled_flag(
+    rocksdb_compactoptions_t*);
+
+extern ROCKSDB_LIBRARY_API void rocksdb_compactoptions_set_canceled(
+    rocksdb_compactoptions_t*, unsigned char);
+
 /* Flush options */
 
 extern ROCKSDB_LIBRARY_API rocksdb_flushoptions_t* rocksdb_flushoptions_create(

@@ -11,6 +11,7 @@
 
 #include <cstdlib>
 #include <map>
+#include <optional>
 #include <unordered_set>
 #include <vector>
 
@@ -177,6 +178,7 @@ struct rocksdb_options_t {
 struct rocksdb_compactoptions_t {
   CompactRangeOptions rep;
   Slice full_history_ts_low;
+  std::optional<std::atomic<bool>> canceled;
 };
 struct rocksdb_block_based_table_options_t {
   BlockBasedTableOptions rep;
@@ -4615,6 +4617,17 @@ void rocksdb_compactoptions_set_full_history_ts_low(
   }
 }
 
+void rocksdb_compactoptions_create_canceled_flag(
+    rocksdb_compactoptions_t* opt) {
+  opt->canceled = false;
+  opt->rep.canceled = &*opt->canceled;
+}
+
+void rocksdb_compactoptions_set_canceled(rocksdb_compactoptions_t* opt,
+                                         unsigned char val) {
+  opt->canceled->store(val, std::memory_order_relaxed);
+}
+
 rocksdb_flushoptions_t* rocksdb_flushoptions_create() {
   return new rocksdb_flushoptions_t;
 }
@@ -5150,7 +5163,8 @@ rocksdb_fifo_compaction_options_t* rocksdb_fifo_compaction_options_create() {
 }
 
 void rocksdb_fifo_compaction_options_set_allow_compaction(
-    rocksdb_fifo_compaction_options_t* fifo_opts, unsigned char allow_compaction) {
+    rocksdb_fifo_compaction_options_t* fifo_opts,
+    unsigned char allow_compaction) {
   fifo_opts->rep.allow_compaction = allow_compaction;
 }
 
